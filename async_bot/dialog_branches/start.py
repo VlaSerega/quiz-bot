@@ -14,6 +14,7 @@ async def command_start(message: types.Message, session: AsyncSession, user: Use
         await update_user(user, session)
 
         await FSMGreeting.team.set()
+        await message.answer("#ОткрывайАлтай с <b>Мариком</b> и <b>Марей</b>")
         await message.answer("Выбери, с кем ты путешествуешь", reply_markup=create_keyboard_inline(
             [Button('Марик', 'Марик'), Button('Маря', 'Маря')]
         ))

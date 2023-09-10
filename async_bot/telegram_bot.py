@@ -46,7 +46,7 @@ class AsyncBot:
         register_branches(self._dp)
         # self._dp.register_message_handler(photo_id, state='*', chat_type=types.ChatType.all(),
         #                                   content_types=types.ContentType.all())
-        # self._dp.register_message_handler(default, state='*', content_types=types.ContentType.ANY)
+        self._dp.register_message_handler(default, content_types=types.ContentType.ANY)
 
         await self._set_commands()
 
