@@ -54,27 +54,55 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
       Question(
           'Вы уже добрались до Бийска?',
           QuestionType.one, answers=['Да', 'Еще нет'],
-          cor_answer='Да',
-          sticker='CAACAgIAAxkBAAPiZPw8yOqJhylJAwoJ5Xket9hNGGYAArQsAAKucNBIdMQwb5fhvYQwBA',
+          cor_answer='Да', sticker_correct='CAACAgIAAxkBAAPiZPw8yOqJhylJAwoJ5Xket9hNGGYAArQsAAKucNBIdMQwb5fhvYQwBA',
           incorrect_reply='Да, расстояние до Бийска не маленькое -  162 км от Барнаула.  Если тебе скучно, спроси у экскурсовода: Где живет бобер?'),
 
       Question(
-          'Отлично! Бийск - один из моих любимых городов Алтайского края! Он был образован по указу Петра I, здесь много старых зданий, мистических легенд и загадок, а значит - много приключений! Готов посетить одно из самых загадочных и святых мест Бийска?',
-          QuestionType.one, answers=['Готов', 'Что-то мне страшненько'], incor_action=Action.next,
-          cor_answer='Готов',
-          sticker='CAACAgIAAxkBAAIBnWT8UNABp6abpY-8nOxv0nXTllZPAAJJLQACwCjZSJklXdyBsY7eMAQ',
-          incorrect_reply='Хо-хо! Настоящие иследователи ничего не боятся. Хотя... мне тоже страшно, когда я не знаю, куда именно мы едем. Усаживайся поудобней, сейчас расскажу.'),
+          'Отлично! Бийск - один из моих любимых городов Алтайского края! Он был образован по указу Петра I, здесь много старых зданий, мистических легенд и загадок, а значит - много приключений! Нажми кнопук "Я в Бийске!" сразу, как въедешь в город.',
+          QuestionType.one, answers=['Я в Бийске'], incor_action=Action.next,
+          cor_answer='Я в Бийске', ),
+      Question(
+          'Отлично!  Видел какие усы у Великого императора? Сделай себе такие же с помощью пальцев и сфотографируйсся вместе с друзьями возле памятника Петру I. Жду фото в чате, это должно быть очень забавно.',
+          QuestionType.photo, sticker_correct='CAACAgIAAxkBAAIDBmUCo1rrURMszOzZTEwRbBlZSIv-AAJ6NQACTyjRSM7mUyhJ7UrzMAQ',
+          correct_reply='Ахаха, очень крутое фото получилось!'),
+      Question(
+          'А теперь мы посетим один из музеев Бийска - старый особняк. С приведениями 👻. Если выберешься оттуда, дай знать, как тебе такая ЭКСКУРСИЯ 😱.\n(Жду от тебя стикер)',
+          QuestionType.sticker,
+          sticker_correct='CAACAgIAAxkBAAIBnWT8UNABp6abpY-8nOxv0nXTllZPAAJJLQACwCjZSJklXdyBsY7eMAQ',
+          correct_reply='Я так и думал! Мне тоже там бывает не по себе.'),
+      Question('А ты знал, что Бийск - купеческий город?', QuestionType.one, answers=['Да', 'Нет'],
+               incor_action=Action.next, cor_answer='Да', correct_reply='Здорово, что ты слушаешь экскурсовода!',
+               incorrect_reply='Я тоже не всегда слушаю экскурсовода.'),
+      Question(
+          'Я придумал тест, который подскажет, смог ли ты стать успешным купцом (бизнесменом) 100 лет назада, жми "Cтарт" и поехали!',
+          QuestionType.one, answers=['Старт'], cor_answer='Старт'),
       Question(
           'Сейчас мы посетим Бийское архиерейское подворье. Здание подворья построено в 1880 году.  Да, да, тогда ещё не родилась даже твоя бабушка. Будь внимателен на экскурсии изапоминай, комнаты какихцветов есть в подворье. После того, как посетишь экскурсию, выбери стикер, с твоей эмоцией от этого места.',
           QuestionType.sticker),
       Question(
           'Класс! Вижу, что Архиерейское подворье не оставило тебя равнодушным. Комната какого цвета понравилась тебе больше всего?',
-          QuestionType.one, answers=['🔴 Красный', '🟡 Желтый', '🟢 Зеленый', '🔵 Синий']),
+          QuestionType.any, answers=['🔴 Красный', '🟡 Желтый', '🟢 Зеленый', '🔵 Синий']),
+      Question('Самое время продолжить наше путешествие', QuestionType.one, answers=['Продолжить путешествие'],
+               cor_answer='Продолжить путешествие'),
+      Question(
+          'Ну что нас ждет обратная дорога, возвращаемся в столицу Алтайского края - город Барнаул! Отправь смайл с которым у тебя ассоциируется этот город.',
+          QuestionType.sticker,
+          sticker_correct='CAACAgIAAxkBAAIDCmUCpJ9MdEymhmBKseNVheHK7qEDAAJ9LQACLpDYSExlbu0ojEi7MAQ'),
+      Question(
+          'Поздравляем!  Ты успешно прошел квест #ОткрывайАлтай ! Покажи экскурсоводу это сообщение и получи свой приз!',
+          QuestionType.one, answers=['Забрал подарок'], sticker_correct='', cor_answer='Забрал подарок'
+      ),
+      Question(
+          'Класс! Но это ещё не все! Теперь ты можешь всегда пользоваться стикерами с Марей и Мариком, для этого сохрани их себе, если не сделал этого раньше\n\n'
+          'А ещё мы с Марей создали чат, где ты можешь общаться и делиться впечатлниями с такими же Открывателями Алтая! Переходи по ссылке, чтобы продолжить приключения с нами! (ссылка на чат/канал)',
+          QuestionType.one, answers=['Завершить'], cor_answer='Завершить'
+      ),
       ]
 
 questions = {
-    Team.marik: [aq[0], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13]],
-    Team.marea: [aq[0], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13]]
+    Team.marik: [aq[0], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13], aq[14], aq[15], aq[16],
+                 aq[17], aq[18], aq[19], aq[20], aq[21]],
+    Team.marea: [aq[9], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13]]
 }
 
 
@@ -151,24 +179,28 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
 
     text = message.text
     if text != question.cor_answer:
+        if question.incorrect_reply is None:
+            await message.delete()
+            return
         if question.incor_action == Action.next:
             keyboard = ReplyKeyboardRemove()
             next = q_num + 1
         else:
             keyboard = create_keyboard_reply(question.answers, [len(question.answers)])
-        if question.sticker is not None:
-            await message.answer_sticker(question.sticker)
+        if question.sticker_incor is not None:
+            await message.answer_sticker(question.sticker_incor)
         await message.answer(question.incorrect_reply, reply_markup=keyboard)
     else:
         if question.correct_reply is not None:
             await message.answer(question.correct_reply)
-        if question.sticker is not None:
-            await message.answer_sticker(question.sticker)
+        if question.sticker_correct is not None:
+            await message.answer_sticker(question.sticker_correct)
         next = q_num + 1
 
     if next >= len(questions[user.team]):
         await state.finish()
         await message.answer("Путешествие закончилось!")
+        return
     if q_num != next:
         question = await process_question(message, questions[user.team][q_num + 1])
         await state.update_data(current=question, current_num=q_num + 1)
@@ -185,6 +217,7 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
         await message.answer("Путешествие закончилось!")
+        return
 
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
@@ -201,6 +234,84 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
         await message.answer("Путешествие закончилось!")
+        return
+
+    question = await process_question(message, questions[user.team][q_num + 1])
+    await state.update_data(current=question, current_num=q_num + 1)
+
+
+async def red_room(message: types.Message, state: FSMContext, user: User):
+    data = await state.get_data()
+    question = data['current']
+    q_num = data['current_num']
+    if question.type != QuestionType.any:
+        await message.delete()
+        return
+
+    await message.answer(
+        'Красный - самый яркий, огненный цвет  В этой комнате раньше был кабинет важной личности. Твой выбор означает, что ты сильная личность, у тебя много энергии, ты умеешь руководить , не боишься брать на себя ответсвенность и принимать сложные решения.')
+
+    if q_num + 1 >= len(questions[user.team]):
+        await state.finish()
+        await message.answer("Путешествие закончилось!")
+        return
+
+    question = await process_question(message, questions[user.team][q_num + 1])
+    await state.update_data(current=question, current_num=q_num + 1)
+
+
+async def yellow_room(message: types.Message, state: FSMContext, user: User):
+    data = await state.get_data()
+    question = data['current']
+    q_num = data['current_num']
+    if question.type != QuestionType.any:
+        await message.delete()
+        return
+
+    await message.answer(
+        'В этой комнате часто проходили важные собрания, в которых всегда присутсововал лидер. Желтый - цвет лидера, если ты выбрал эту комнату, значит в тебе есть лидерские качества, способность объединять и вести за собой.')
+    if q_num + 1 >= len(questions[user.team]):
+        await state.finish()
+        await message.answer("Путешествие закончилось!")
+        return
+
+    question = await process_question(message, questions[user.team][q_num + 1])
+    await state.update_data(current=question, current_num=q_num + 1)
+
+
+async def green_room(message: types.Message, state: FSMContext, user: User):
+    data = await state.get_data()
+    question = data['current']
+    q_num = data['current_num']
+    if question.type != QuestionType.any:
+        await message.delete()
+        return
+
+    await message.answer(
+        'В этой комнате раньше был кабинет, где день за днем кипела размеренная работа. Выбор этой комнаты говорит о том, что ты спокойный, уравновешенный, интеллектально разивит, терпелив, можешь выполнять сложные  и объёмные задачи.')
+    if q_num + 1 >= len(questions[user.team]):
+        await state.finish()
+        await message.answer("Путешествие закончилось!")
+        return
+
+    question = await process_question(message, questions[user.team][q_num + 1])
+    await state.update_data(current=question, current_num=q_num + 1)
+
+
+async def blue_room(message: types.Message, state: FSMContext, user: User):
+    data = await state.get_data()
+    question = data['current']
+    q_num = data['current_num']
+    if question.type != QuestionType.any:
+        await message.delete()
+        return
+
+    await message.answer(
+        'В этой комнате ранее проводились разного рода собрания и принимались важные решения., если ты выбрал эту комнату, это говорит о том, что ты очень общительный и у тебя много друзей, ты умеешь поддерживать непринуждную и легкую атмосферу в коллективе.')
+    if q_num + 1 >= len(questions[user.team]):
+        await state.finish()
+        await message.answer("Путешествие закончилось!")
+        return
 
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
@@ -211,6 +322,10 @@ def register_stations(dp: Dispatcher):
     dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
     dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
                                        state=FSMQuestion.question)
+    dp.register_message_handler(red_room, text='🔴 Красный', state=FSMQuestion.question)
+    dp.register_message_handler(yellow_room, text='🟡 Желтый', state=FSMQuestion.question)
+    dp.register_message_handler(green_room, text='🟢 Зеленый', state=FSMQuestion.question)
+    dp.register_message_handler(blue_room, text='🔵 Синий', state=FSMQuestion.question)
     dp.register_message_handler(message_answer, state=FSMQuestion.question)
     dp.register_message_handler(photo_answer, content_types=types.ContentType.PHOTO, state=FSMQuestion.question)
     dp.register_message_handler(sticker_answer, content_types=types.ContentType.STICKER, state=FSMQuestion.question)

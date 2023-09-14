@@ -4,9 +4,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.states import FSMGreeting
 from async_bot.dialog_branches.text_message import OLEN_GREET
-from async_bot.dialog_branches.utils import menu_keyboard
+from async_bot.dialog_branches.utils import menu_keyboard, Button, create_keyboard_inline
 from database.crud import *
 from database.models import Team
+
+
+async def greeting_name(message: types.Message):
+    await message.answer(
+        f"Отлично, <b>{message.text}</b>. Сейчас тебе нужно выбрать верный маршрут твоего путешествия. Первая остановка будет в ... (Если сомневаешся, уточни у экскурсовода)",
+        reply_markup=create_keyboard_inline(
+            [Button('В полковниково с Мариком', 'Марик'), Button('В Бийске с Марей', 'Маря')]
+        ))
+    await FSMGreeting.next()
 
 
 async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, user: User,
