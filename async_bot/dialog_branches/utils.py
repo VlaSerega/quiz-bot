@@ -71,7 +71,7 @@ async def process_question(message: types.Message, question: Question | List[Que
         rows.append(1)
 
         keyboard = create_keyboard_inline(buttons, rows)
-    elif question.type == QuestionType.one:
+    elif question.type == QuestionType.one or question.type == QuestionType.any:
         keyboard = create_keyboard_reply(answers, [len(answers)])
 
     if question.picture is not None:

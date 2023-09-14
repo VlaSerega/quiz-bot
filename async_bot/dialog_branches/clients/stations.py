@@ -62,7 +62,7 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
           QuestionType.one, answers=['Я в Бийске'], incor_action=Action.next,
           cor_answer='Я в Бийске', ),
       Question(
-          'Отлично!  Видел какие усы у Великого императора? Сделай себе такие же с помощью пальцев и сфотографируйсся вместе с друзьями возле памятника Петру I. Жду фото в чате, это должно быть очень забавно.',
+          'Отлично! Видел какие усы у Великого императора? Сделай себе такие же с помощью пальцев и сфотографируйсся вместе с друзьями возле памятника Петру I. Жду фото в чате, это должно быть очень забавно.',
           QuestionType.photo, sticker_correct='CAACAgIAAxkBAAIDBmUCo1rrURMszOzZTEwRbBlZSIv-AAJ6NQACTyjRSM7mUyhJ7UrzMAQ',
           correct_reply='Ахаха, очень крутое фото получилось!'),
       Question(
@@ -85,12 +85,14 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
       Question('Самое время продолжить наше путешествие', QuestionType.one, answers=['Продолжить путешествие'],
                cor_answer='Продолжить путешествие'),
       Question(
-          'Ну что нас ждет обратная дорога, возвращаемся в столицу Алтайского края - город Барнаул! Отправь смайл с которым у тебя ассоциируется этот город.',
+          'Ну что, нас ждет обратная дорога, возвращаемся в столицу Алтайского края - город Барнаул! Отправь смайл с которым у тебя ассоциируется этот город.',
           QuestionType.sticker,
           sticker_correct='CAACAgIAAxkBAAIDCmUCpJ9MdEymhmBKseNVheHK7qEDAAJ9LQACLpDYSExlbu0ojEi7MAQ'),
       Question(
-          'Поздравляем!  Ты успешно прошел квест #ОткрывайАлтай ! Покажи экскурсоводу это сообщение и получи свой приз!',
-          QuestionType.one, answers=['Забрал подарок'], sticker_correct='', cor_answer='Забрал подарок'
+          'Поздравляем! Ты успешно прошел квест #ОткрывайАлтай! Покажи экскурсоводу это сообщение и получи свой приз!',
+          QuestionType.one, answers=['Забрал подарок'],
+          sticker_correct='CAACAgIAAxkBAAIDCmUCpJ9MdEymhmBKseNVheHK7qEDAAJ9LQACLpDYSExlbu0ojEi7MAQ',
+          cor_answer='Забрал подарок'
       ),
       Question(
           'Класс! Но это ещё не все! Теперь ты можешь всегда пользоваться стикерами с Марей и Мариком, для этого сохрани их себе, если не сделал этого раньше\n\n'
@@ -102,7 +104,8 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
 questions = {
     Team.marik: [aq[0], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13], aq[14], aq[15], aq[16],
                  aq[17], aq[18], aq[19], aq[20], aq[21]],
-    Team.marea: [aq[9], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13]]
+    Team.marea: [aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[16], aq[17], aq[13], aq[14], aq[15], aq[0], aq[1],
+                 aq[2:7], aq[18], aq[19], aq[20], aq[21]]
 }
 
 
@@ -199,7 +202,7 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
 
     if next >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
     if q_num != next:
         question = await process_question(message, questions[user.team][q_num + 1])
@@ -216,7 +219,7 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
 
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -233,7 +236,7 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
 
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -253,7 +256,7 @@ async def red_room(message: types.Message, state: FSMContext, user: User):
 
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -272,7 +275,7 @@ async def yellow_room(message: types.Message, state: FSMContext, user: User):
         'В этой комнате часто проходили важные собрания, в которых всегда присутсововал лидер. Желтый - цвет лидера, если ты выбрал эту комнату, значит в тебе есть лидерские качества, способность объединять и вести за собой.')
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -291,7 +294,7 @@ async def green_room(message: types.Message, state: FSMContext, user: User):
         'В этой комнате раньше был кабинет, где день за днем кипела размеренная работа. Выбор этой комнаты говорит о том, что ты спокойный, уравновешенный, интеллектально разивит, терпелив, можешь выполнять сложные  и объёмные задачи.')
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -310,7 +313,7 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
         'В этой комнате ранее проводились разного рода собрания и принимались важные решения., если ты выбрал эту комнату, это говорит о том, что ты очень общительный и у тебя много друзей, ты умеешь поддерживать непринуждную и легкую атмосферу в коллективе.')
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!")
+        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
     question = await process_question(message, questions[user.team][q_num + 1])
@@ -319,9 +322,9 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
 
 def register_stations(dp: Dispatcher):
     dp.register_message_handler(go, text="🚌 Поехали", chat_type=types.ChatType.PRIVATE)
-    dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
-    dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
-                                       state=FSMQuestion.question)
+    # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
+    # dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
+    #                                    state=FSMQuestion.question)
     dp.register_message_handler(red_room, text='🔴 Красный', state=FSMQuestion.question)
     dp.register_message_handler(yellow_room, text='🟡 Желтый', state=FSMQuestion.question)
     dp.register_message_handler(green_room, text='🟢 Зеленый', state=FSMQuestion.question)

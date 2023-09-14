@@ -24,15 +24,15 @@ async def command_start(message: types.Message, session: AsyncSession, user: Use
 
 async def change_team(message: types.Message, session: AsyncSession, user: User, state: FSMContext):
     if user.team is None:
-        await message.answer('Ты пока еще не присоединился ни к одной окманде')
+        await message.answer('Ты пока еще не присоединился ни к одной окманде', reply_markup=ReplyKeyboardRemove())
         return
 
     if user.team == Team.marik:
         user.team = Team.marea
-        await message.answer('Теперь ты в команде "Мари"')
+        await message.answer('Теперь ты в команде "Мари"', reply_markup=ReplyKeyboardRemove())
     else:
         user.team = Team.marik
-        await message.answer('Теперь ты в команде "Марика"')
+        await message.answer('Теперь ты в команде "Марика"', reply_markup=ReplyKeyboardRemove())
 
     await update_user(user, session)
     await state.finish()
