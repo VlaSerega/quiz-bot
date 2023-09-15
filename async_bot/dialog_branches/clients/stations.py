@@ -7,7 +7,7 @@ from aiogram.utils.callback_data import CallbackData
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
-from async_bot.dialog_branches.clients.states import FSMQuestion
+from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest
 from async_bot.dialog_branches.utils import process_question, callback_data_answer, Button, \
     create_keyboard_inline, process_remain_question, create_keyboard_reply
 from database.models import User, Team
@@ -75,7 +75,7 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
                incorrect_reply='Я тоже не всегда слушаю экскурсовода.'),
       Question(
           'Я придумал тест, который подскажет, смог ли ты стать успешным купцом (бизнесменом) 100 лет назада, жми "Cтарт" и поехали!',
-          QuestionType.one, answers=['Старт'], cor_answer='Старт'),
+          QuestionType.one, answers=['Старт'], cor_answer='Старт', state=FSMTest.test),
       Question(
           'Сейчас мы посетим Бийское архиерейское подворье. Здание подворья построено в 1880 году.  Да, да, тогда ещё не родилась даже твоя бабушка. Будь внимателен на экскурсии изапоминай, комнаты какихцветов есть в подворье. После того, как посетишь экскурсию, выбери стикер, с твоей эмоцией от этого места.',
           QuestionType.sticker),
@@ -186,7 +186,7 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
             await message.delete()
             return
         if question.incor_action == Action.next:
-            keyboard = ReplyKeyboardRemove()
+            keyboard = None
             next = q_num + 1
         else:
             keyboard = create_keyboard_reply(question.answers, [len(question.answers)])

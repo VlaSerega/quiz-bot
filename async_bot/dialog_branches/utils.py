@@ -79,7 +79,8 @@ async def process_question(message: types.Message, question: Question | List[Que
                                    reply_markup=keyboard)
     else:
         await message.answer(question.body, reply_markup=keyboard)
-
+    if question.state is not None:
+        await question.state.set()
     return question
 
 

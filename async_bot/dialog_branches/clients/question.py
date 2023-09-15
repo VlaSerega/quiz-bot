@@ -16,8 +16,9 @@ class Action(enum.Enum):
 
 class Question:
 
-    def __init__(self, body, type, answers=None, cor_answer=None, correct_reply=None, incor_action=Action.stay,
-                 picture=None, sticker_correct=None, sticker_incor=None, incorrect_reply=None):
+    def __init__(self, body, type=QuestionType.one, answers=None, cor_answer=None, correct_reply=None,
+                 incor_action=Action.stay,
+                 picture=None, sticker_correct=None, sticker_incor=None, incorrect_reply=None, state=None):
         self.body = body
         self.answers = answers
         self.correct_reply = correct_reply
@@ -28,3 +29,4 @@ class Question:
         self.cor_answer = cor_answer
         self.incor_action = incor_action
         self.incorrect_reply = incorrect_reply
+        self.state = state

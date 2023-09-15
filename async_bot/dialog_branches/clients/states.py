@@ -8,3 +8,7 @@ class FSMGreeting(StatesGroup):
 
 class FSMQuestion(StatesGroup):
     question = State()
+
+
+class FSMTest(StatesGroup):
+    test = State()

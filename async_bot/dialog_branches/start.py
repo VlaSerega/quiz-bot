@@ -39,8 +39,7 @@ async def change_team(message: types.Message, session: AsyncSession, user: User,
 
 
 async def command_creator(message: types.Message):
-    await message.answer("Создатель бота: @VlaSerega.",
-                         reply_markup=ReplyKeyboardRemove())
+    await message.answer("Создатель бота: @VlaSerega.")
 
 
 def register_start_handlers(dp: Dispatcher):
