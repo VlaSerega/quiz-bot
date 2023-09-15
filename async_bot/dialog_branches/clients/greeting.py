@@ -37,4 +37,5 @@ async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, us
 
 
 def register_greeting(dp: Dispatcher):
+    dp.register_message_handler(greeting_name, state=FSMGreeting.name)
     dp.register_callback_query_handler(greeting_team, state=FSMGreeting.team)
