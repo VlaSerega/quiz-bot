@@ -29,10 +29,10 @@ async def change_team(message: types.Message, session: AsyncSession, user: User,
 
     if user.team == Team.marik:
         user.team = Team.marea
-        await message.answer('Теперь ты в команде "Мари"', reply_markup=ReplyKeyboardRemove())
+        await message.answer('Теперь ты в команде "Мари"', reply_markup=menu_keyboard)
     else:
         user.team = Team.marik
-        await message.answer('Теперь ты в команде "Марика"', reply_markup=ReplyKeyboardRemove())
+        await message.answer('Теперь ты в команде "Марика"', reply_markup=menu_keyboard)
 
     await update_user(user, session)
     await state.finish()
