@@ -108,7 +108,7 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
 questions = {
     Team.marik: [aq[0], aq[1], aq[2:7], aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[13], aq[14], aq[15], aq[22],
                  aq[16], aq[17], aq[18], aq[19], aq[20], aq[21]],
-    Team.marea: [aq[7], aq[8], aq[9], aq[10], aq[11], aq[12], aq[16], aq[17], aq[14], aq[22], aq[15], aq[0],
+    Team.marea: [aq[9], aq[10], aq[11], aq[12], aq[16], aq[17], aq[14], aq[15], aq[22], aq[0],
                  aq[1], aq[2:7], aq[18], aq[19], aq[20], aq[21]]
 }
 
