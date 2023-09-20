@@ -238,7 +238,7 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
         return
 
     if question.correct_reply is not None:
-        await message.answer(question.correct_reply)
+        await message.answer(question.correct_reply, reply_markup=ReplyKeyboardRemove())
 
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
