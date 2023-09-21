@@ -226,9 +226,7 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
-    next_type = questions[user.team][q_num + 1].type
-    additional = close_keyboard if next_type == QuestionType.one or next_type == QuestionType.any else None
-    question = await process_question(message, questions[user.team][q_num + 1], additional)
+    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -248,9 +246,7 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
-    next_type = questions[user.team][q_num + 1].type
-    additional = close_keyboard if next_type == QuestionType.one or next_type == QuestionType.any else None
-    question = await process_question(message, questions[user.team][q_num + 1], additional)
+    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 

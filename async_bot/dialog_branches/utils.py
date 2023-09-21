@@ -63,6 +63,7 @@ async def process_question(message: types.Message, question: Question | List[Que
     if type(question) is list:
         question = random.choice(question)
     answers = question.answers
+    text_message = question.body
 
     if question.type == QuestionType.some:
         buttons = [Button(f"⚪ {a.answer}", callback_data_answer.new(answer_id=i)) for i, a in enumerate(answers)]
@@ -73,9 +74,9 @@ async def process_question(message: types.Message, question: Question | List[Que
         keyboard = create_keyboard_inline(buttons, rows)
     elif question.type == QuestionType.one or question.type == QuestionType.any:
         keyboard = create_keyboard_reply(answers, [len(answers)])
-    text_message = question.body
-    if additional_message is not None:
-        text_message += additional_message
+        if additional_message is not None:
+            text_message += additional_message
+
     if question.picture is not None:
         await message.answer_photo(question.picture, caption=text_message,
                                    reply_markup=keyboard)
