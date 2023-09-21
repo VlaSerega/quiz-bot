@@ -110,7 +110,7 @@ questions = {
                  aq[1], aq[2:7], aq[18], aq[19], aq[20], aq[21]]
 }
 
-close_keyboard = '\n\n<i>(сверни клавиатуру, чтобы увидеть варианты ответов)</i>)'
+close_keyboard = '\n\n<i>(сверни клавиатуру, чтобы увидеть варианты ответов)</i>'
 
 
 async def go(message: types.Message, user: User):
