@@ -58,7 +58,7 @@ def create_keyboard_inline(buttons: List[Button], rows: List[int] = None) -> Inl
     return keyboard
 
 
-async def process_question(message: types.Message, question: Question | List[Question]):
+async def process_question(message: types.Message, question: Question | List[Question], additional_message=None):
     keyboard = ReplyKeyboardRemove()
     if type(question) is list:
         question = random.choice(question)
@@ -73,12 +73,14 @@ async def process_question(message: types.Message, question: Question | List[Que
         keyboard = create_keyboard_inline(buttons, rows)
     elif question.type == QuestionType.one or question.type == QuestionType.any:
         keyboard = create_keyboard_reply(answers, [len(answers)])
-
+    text_message = question.body
+    if additional_message is not None:
+        text_message += additional_message
     if question.picture is not None:
-        await message.answer_photo(question.picture, caption=question.body,
+        await message.answer_photo(question.picture, caption=text_message,
                                    reply_markup=keyboard)
     else:
-        await message.answer(question.body, reply_markup=keyboard)
+        await message.answer(text_message, reply_markup=keyboard)
     if question.state is not None:
         await question.state.set()
     return question

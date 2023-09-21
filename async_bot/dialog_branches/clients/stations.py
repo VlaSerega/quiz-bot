@@ -3,7 +3,6 @@ import datetime
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
-from aiogram.utils.callback_data import CallbackData
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
@@ -110,6 +109,8 @@ questions = {
     Team.marea: [aq[9], aq[10], aq[11], aq[12], aq[16], aq[17], aq[14], aq[15], aq[22], aq[0],
                  aq[1], aq[2:7], aq[18], aq[19], aq[20], aq[21]]
 }
+
+close_keyboard = '\n\n<i>(сверни клавиатуру, чтобы увидеть варианты ответов)</i>)'
 
 
 async def go(message: types.Message, user: User):
@@ -225,7 +226,9 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    next_type = questions[user.team][q_num + 1].type
+    additional = close_keyboard if next_type == QuestionType.one or next_type == QuestionType.any else None
+    question = await process_question(message, questions[user.team][q_num + 1], additional)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -245,7 +248,9 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    next_type = questions[user.team][q_num + 1].type
+    additional = close_keyboard if next_type == QuestionType.one or next_type == QuestionType.any else None
+    question = await process_question(message, questions[user.team][q_num + 1], additional)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
