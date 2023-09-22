@@ -58,6 +58,7 @@ class AsyncBot:
             await self.bot.session.close()
 
     async def _set_commands(self):
-        commands = [BotCommand('change_team', 'сменить команду')]
+        commands = [BotCommand('change_team', 'Сменить команду')]
+        commands = [BotCommand('legend', 'Легенда о маралах')]
 
         await self.bot.set_my_commands(commands, scope=BotCommandScopeDefault())
