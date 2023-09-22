@@ -38,6 +38,14 @@ async def change_team(message: types.Message, session: AsyncSession, user: User,
     await state.finish()
 
 
+async def legend(message: types.Message):
+    await message.answer("""Один марал-мальчик родился в синем цвете. В детстве он был очень сильным и ловким маралом. И вот одним ранним весенним утром охотники увидели синего оленя, который очень отличался от здешних лесных обитателей. Они захотели получить его мех. 
+Марал услышал выстрел и побежал со всех ног в лесную чащу. Лес был очень густой и маралу приходилось использовать всю свою силу и ловкость, чтобы пробираться сквозь лесную чащу, но охотники не отставали от него и преследовали марала днями и ночами. В один из дней, пробираясь через густо произрастающие сосны, он выбился из сил, ударился о ствол дерева и потерял рог. Охотники взяли этот рог и прекратили поиски синего марала.
+Тем временем он выбрался на пригорок, где повсюду цвели кусты маральника. Марал сильно устал и лег на траву отдохнуть. Проснулся он от того, что на него аккуратно издалека смотрела,покрытая розовым мехом, марал-девочка. Она была взволнована, потому что думала, что является единственным цветным маралом. 
+Марал взглянул на нее и сразу влюбился! Он медленно и осторожно подошел и подарил ей цветок маральника. С тех самых пор они вместе путешествуют по Алтайскому краю, а девочка-марал никогда не снимает подаренный цветок. 
+""")
+
+
 async def command_creator(message: types.Message):
     await message.answer("Создатель бота: @VlaSerega.")
 
@@ -46,3 +54,4 @@ def register_start_handlers(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=["start"], chat_type=types.ChatType.PRIVATE)
     dp.register_message_handler(command_creator, commands=['creator'], state="*", chat_type=types.ChatType.PRIVATE)
     dp.register_message_handler(change_team, commands=['change_team'], state="*", chat_type=types.ChatType.PRIVATE)
+    dp.register_message_handler(legend, commands=['legend'], state='*', chat_type=types.ChatType.PRIVATE)
