@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   postgres:
-    container_name: bot_postgres_db
+    container_name: quiz_postgres_db
     image: postgres:15.1
     environment:
       POSTGRES_DB: "quiz-travel"
@@ -9,3 +9,24 @@ services:
       POSTGRES_PASSWORD: "user1234"
     ports:
       - "6000:5432"
+    volumes:
+      - postgres_quiz:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz_bot
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+
+volumes:
+  postgres_quiz:
+
+networks:
+  mynetwork:
+    driver: bridge
