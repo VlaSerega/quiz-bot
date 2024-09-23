@@ -5,7 +5,7 @@ FROM python:3.10-slim
 WORKDIR /quiz
 
 # Копируем файл зависимостей
-COPY requirements.txt /ohotkin/
+COPY requirements.txt /quiz/
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
