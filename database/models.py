@@ -58,7 +58,7 @@ def get_sessionmaker() -> sessionmaker:
     user = getenv('POSTGRES_USER')
     password = getenv('POSTGRES_PASSWORD')
 
-    engine = create_async_engine(f'postgresql+asyncpg://user:user1234@127.0.0.1:6000/quiz-travel', echo=True)
+    engine = create_async_engine(f'postgresql+asyncpg://user:user1234@postgres:6000/quiz-travel', echo=True)
     async_session = sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
