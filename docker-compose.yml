@@ -14,15 +14,15 @@ services:
     networks:
       - mynetwork
 
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: quiz_bot
-    depends_on:
-      - postgres
-    networks:
-      - mynetwork
+#  bot:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: quiz_bot
+#    depends_on:
+#      - postgres
+#    networks:
+#      - mynetwork
 
 volumes:
   postgres_quiz:

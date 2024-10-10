@@ -1,8 +1,10 @@
 import datetime
+from typing import List
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
+from aiogram_media_group import media_group_handler
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
@@ -213,20 +215,23 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
         await state.update_data(current=question, current_num=q_num + 1)
 
 
-async def photo_answer(message: types.Message, user: User, state: FSMContext):
+async def photo_answer(messages: List[types.Message], user: User, state: FSMContext):
     data = await state.get_data()
     question = data['current']
     q_num = data['current_num']
+
     if question.type != QuestionType.photo:
-        await message.delete()
+        await messages[-1].delete()
         return
+
+    await redirect_photo(messages)
 
     if q_num + 1 >= len(questions[user.team]):
         await state.finish()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
+        await messages[-1].answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
-    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
+    question = await process_question(messages[-1], questions[user.team][q_num + 1], close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -327,6 +332,19 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
     await state.update_data(current=question, current_num=q_num + 1)
 
 
+CHAT_ID = 1
+
+
+async def redirect_photo(messages: List[types.Message]):
+    bot = messages[-1].bot
+
+    await bot.forward_message(CHAT_ID, messages[-1].chat.id, messages[-1].message_id)
+
+
+async def print_chat_id(message: types.Message):
+    print('----------------', message.chat.id)
+
+
 def register_stations(dp: Dispatcher):
     dp.register_message_handler(go, text="🚌 Поехали", chat_type=types.ChatType.PRIVATE)
     # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
@@ -337,5 +355,9 @@ def register_stations(dp: Dispatcher):
     dp.register_message_handler(green_room, text='🟢 Зеленый', state=FSMQuestion.question)
     dp.register_message_handler(blue_room, text='🔵 Синий', state=FSMQuestion.question)
     dp.register_message_handler(message_answer, state=FSMQuestion.question)
-    dp.register_message_handler(photo_answer, content_types=types.ContentType.PHOTO, state=FSMQuestion.question)
+    dp.register_message_handler(media_group_handler(photo_answer), content_types=types.ContentType.PHOTO,
+                                state=FSMQuestion.question)
     dp.register_message_handler(sticker_answer, content_types=types.ContentType.STICKER, state=FSMQuestion.question)
+
+    dp.register_message_handler(media_group_handler(redirect_photo), content_types=types.ContentType.PHOTO)
+    dp.register_message_handler(print_chat_id, chat_type=types.ChatType.CHANNEL)
