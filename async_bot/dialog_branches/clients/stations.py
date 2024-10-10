@@ -304,7 +304,7 @@ def register_stations(dp: Dispatcher):
     dp.message.register(yellow_room, F.text == '🟡 Желтый', FSMQuestion.question)
     dp.message.register(green_room, F.text == '🟢 Зеленый', FSMQuestion.question)
     dp.message.register(blue_room, F.text == '🔵 Синий', FSMQuestion.question)
-    dp.message.register(message_answer, FSMQuestion.question)
+    dp.message.register(message_answer, F.text, FSMQuestion.question)
     dp.message.register(media_group_handler(photo_answer), F.photo, FSMQuestion.question)
     dp.message.register(sticker_answer, F.sticker, FSMQuestion.question)
 
