@@ -53,7 +53,7 @@ class AsyncBot:
         await self._set_commands()
 
         try:
-            await self._dp.start_polling()
+            await self._dp.start_polling(self.bot)
         finally:
             await self._dp.storage.close()
             await self.bot.session.close()
