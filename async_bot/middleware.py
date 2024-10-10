@@ -26,12 +26,12 @@ class DbSessionMiddleware(BaseMiddleware):
     async def open_session_and_get_user(self, message, data: dict):
         session = self._sessionmaker()
         data[const.SESSION] = session
-
-        user = await get_user_by_id(message.chat.id, session)
+        print(message.chat.id)
+        user = await get_user_by_id(message.from_user.id, session)
         data[const.USER] = user
 
         if user is not None:
-            user.username = message.chat.username
+            user.username = message.from_user.username
             await update_user(user, session)
 
     async def close_session(self, data: dict):
