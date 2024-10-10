@@ -1,8 +1,8 @@
 import logging
-from os import getenv
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from dotenv import load_dotenv
 
@@ -32,9 +32,11 @@ async def default(message: types.Message):
 class AsyncBot:
 
     def __init__(self, sessionmaker):
-        self.bot = Bot(token, parse_mode=types.ParseMode.HTML)
-        self._dp: Dispatcher = Dispatcher(self.bot, storage=MemoryStorage())
-        self._dp.middleware.setup(DbSessionMiddleware(sessionmaker))
+        self.bot = Bot(token=token, default=DefaultBotProperties(parse_mode='HTML'))
+        self._dp: Dispatcher = Dispatcher(bot=self.bot, storage=MemoryStorage())
+
+        self._dp.message.middleware(DbSessionMiddleware(sessionmaker))
+        self._dp.callback_query.middleware(DbSessionMiddleware(sessionmaker))
 
         logging.basicConfig(
             filename="log.txt",
@@ -46,7 +48,7 @@ class AsyncBot:
         register_branches(self._dp)
         # self._dp.register_message_handler(photo_id, state='*', chat_type=types.ChatType.all(),
         #                                   content_types=types.ContentType.all())
-        self._dp.register_message_handler(default, content_types=types.ContentType.ANY)
+        self._dp.message.register(default, content_types=types.ContentType.ANY)
 
         await self._set_commands()
 
@@ -54,11 +56,10 @@ class AsyncBot:
             await self._dp.start_polling()
         finally:
             await self._dp.storage.close()
-            await self._dp.storage.wait_closed()
             await self.bot.session.close()
 
     async def _set_commands(self):
-        commands = [BotCommand('change_team', 'Сменить команду'),
-                    BotCommand('legend', 'Легенда о маралах')]
+        commands = [BotCommand(command='change_team', description='Сменить команду'),
+                    BotCommand(command='legend', description='Легенда о маралах')]
 
         await self.bot.set_my_commands(commands, scope=BotCommandScopeDefault())

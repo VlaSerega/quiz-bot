@@ -1,5 +1,6 @@
 from aiogram import types, Dispatcher
-from aiogram.dispatcher import FSMContext
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,7 +36,7 @@ async def change_team(message: types.Message, session: AsyncSession, user: User,
         await message.answer('Теперь ты в команде "Марика"', reply_markup=menu_keyboard)
 
     await update_user(user, session)
-    await state.finish()
+    await state.set_state()
 
 
 async def legend(message: types.Message):
@@ -51,7 +52,7 @@ async def command_creator(message: types.Message):
 
 
 def register_start_handlers(dp: Dispatcher):
-    dp.register_message_handler(command_start, commands=["start"], chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(command_creator, commands=['creator'], state="*", chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(change_team, commands=['change_team'], state="*", chat_type=types.ChatType.PRIVATE)
-    dp.register_message_handler(legend, commands=['legend'], state='*', chat_type=types.ChatType.PRIVATE)
+    dp.message.register(command_start, Command("start"))
+    dp.message.register(command_creator, Command('creator'))
+    dp.message.register(change_team, Command('change_team'))
+    dp.message.register(legend, Command('legend'))

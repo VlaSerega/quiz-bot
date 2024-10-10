@@ -1,5 +1,5 @@
-from aiogram import types, Dispatcher
-from aiogram.dispatcher import FSMContext
+from aiogram import types, Dispatcher, F
+from aiogram.fsm.context import FSMContext
 
 from async_bot.dialog_branches.clients.question import Question
 from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest
@@ -34,10 +34,9 @@ quest = [
 
 
 async def start_test(message: types.Message, state: FSMContext, user: User):
-    async with state.proxy() as data:
-        data['score'] = 0
-        data['test_current'] = quest[0]
-        data['test_num'] = 0
+    await state.update_data(score=0)
+    await state.update_data(test_current=quest[0])
+    await state.update_data(test_num=0)
 
     await message.answer(quest[0].body,
                          reply_markup=create_keyboard_reply(quest[0].answers, [len(quest[0].answers)]))
@@ -70,11 +69,13 @@ async def ask_quest(message: types.Message, state: FSMContext, user: User):
             await message.answer(
                 'Мне тоже интересно, что бы было, если бы купец 100 лет назад принимал такие решения. Возможно тебе могло повезти, но риски потерять все слишком высоки.')
         await FSMQuestion.question.set()
+
         q_num = data['current_num']
         question = await process_question(message, questions[user.team][q_num + 1])
+
         await state.update_data(current=question, current_num=q_num + 1)
 
 
 def register_test(dp: Dispatcher):
-    dp.register_message_handler(start_test, text='Старт', state=FSMTest.test)
-    dp.register_message_handler(ask_quest, state=FSMTest.test)
+    dp.message.register(start_test, F.text == 'Старт', FSMTest.test)
+    dp.message.register(ask_quest, FSMTest.test)

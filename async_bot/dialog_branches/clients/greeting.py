@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from aiogram.dispatcher import FSMContext
+from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.states import FSMGreeting
@@ -9,13 +9,13 @@ from database.crud import *
 from database.models import Team
 
 
-async def greeting_name(message: types.Message):
+async def greeting_name(message: types.Message, state: FSMContext):
     await message.answer(
         f"Отлично, <b>{message.text}</b>. Сейчас тебе нужно выбрать верный маршрут твоего путешествия. Первая остановка будет в ... (Если сомневаешся, уточни у экскурсовода)",
         reply_markup=create_keyboard_inline(
             [Button('В полковниково с Мариком', 'Марик'), Button('В Бийске с Марей', 'Маря')]
         ))
-    await FSMGreeting.next()
+    await state.set_state(FSMGreeting.team)
 
 
 async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, user: User,
@@ -33,9 +33,9 @@ async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, us
         await callback.message.answer_sticker("CAACAgIAAxkBAAPkZPw820nCz5QPVVfoC9OTN7h94mYAAlUtAALkddlINjFgUFvPAAGCMAQ")
         await callback.message.answer(OLEN_GREET.format('Маря'), reply_markup=menu_keyboard)
     await update_user(user, session)
-    await state.finish()
+    await state.clear()
 
 
 def register_greeting(dp: Dispatcher):
-    dp.register_message_handler(greeting_name, state=FSMGreeting.name)
-    dp.register_callback_query_handler(greeting_team, state=FSMGreeting.team)
+    dp.message.register(greeting_name, FSMGreeting.name)
+    dp.callback_query.register(greeting_team, FSMGreeting.team)

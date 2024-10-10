@@ -110,4 +110,21 @@ def format_text_with_entities(text, entities, as_html=True):
         return message.md_text
 
 
+def message_by_part(text) -> list:
+    messages = []
+    tmp = ''
+
+    for s in text.split('\n'):
+        if len(tmp) + len(s) < 4096:
+            tmp += '\n' + s
+        else:
+            messages.append(tmp)
+            tmp = ''
+    tmp = tmp.strip()
+    if len(tmp) > 2:
+        messages.append(tmp)
+
+    return messages
+
+
 menu_keyboard = create_keyboard_reply(["🚌 Поехали"], rows=[1])

@@ -2,16 +2,16 @@ import datetime
 import logging
 from typing import List
 
-from aiogram import Dispatcher, types
-from aiogram.dispatcher import FSMContext
+from aiogram import Dispatcher, types, F
+from aiogram.enums import ChatType
+from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 from aiogram_media_group import media_group_handler
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
 from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest
-from async_bot.dialog_branches.utils import process_question, callback_data_answer, Button, \
-    create_keyboard_inline, process_remain_question, create_keyboard_reply
+from async_bot.dialog_branches.utils import process_question, process_remain_question, create_keyboard_reply
 from database.models import User, Team
 
 aq = [Question('Ты уже в музее Германа Титова в селе Полковниково?',
@@ -116,47 +116,14 @@ questions = {
 close_keyboard = '\n\n<i>(сверни клавиатуру, чтобы увидеть варианты ответов)</i>'
 
 
-async def go(message: types.Message, user: User):
-    await FSMQuestion.question.set()
-    state = Dispatcher.get_current().current_state()
+async def go(message: types.Message, user: User, state: FSMContext):
+    await state.set_state(FSMQuestion.question)
 
-    async with state.proxy() as data:
-        data['current'] = questions[user.team][0]
-        data['current_num'] = 0
-        data['selected_answers'] = []
-        data['start'] = datetime.datetime.now()
+    data = {'current': questions[user.team][0], 'current_num': 0, 'selected_answers': [],
+            'start': datetime.datetime.now()}
+    await state.update_data(data)
 
     await process_question(message, questions[user.team][0])
-
-
-def select_symbol(a_id, s_answer):
-    if a_id in s_answer:
-        return "🟢"
-    else:
-        return "⚪"
-
-
-async def callback_answer(callback: types.CallbackQuery, callback_data: dict, state: FSMContext):
-    await callback.answer()
-    answer_id = int(callback_data['answer_id'])
-
-    async with state.proxy() as data:
-        question = data['current']
-        if answer_id in data['selected_answers']:
-            data['selected_answers'].remove(answer_id)
-        else:
-            data['selected_answers'].append(answer_id)
-        s_answer = data['selected_answers']
-
-    answers = question.answers
-    buttons = [Button(f"{select_symbol(a.id, s_answer)} {a.answer}",
-                      callback_data_answer.new(answer_id=a.id)) for a in answers]
-    rows = [2 if (i + 1) * 2 <= len(buttons) else 1 for i in range((len(buttons) + 1) // 2)]
-    buttons.append(Button('Ответить', 'Ответ'))
-    rows.append(1)
-
-    keyboard = create_keyboard_inline(buttons, rows)
-    await callback.message.edit_reply_markup(reply_markup=keyboard)
 
 
 async def callback_send_answers(callback: types.CallbackQuery, session: AsyncSession, user: User, state: FSMContext):
@@ -208,7 +175,7 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
         next = q_num + 1
 
     if next >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
     if q_num != next:
@@ -228,7 +195,7 @@ async def photo_answer(messages: List[types.Message], user: User, state: FSMCont
     await redirect_photo(messages)
 
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await messages[-1].answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -248,7 +215,7 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
         await message.answer(question.correct_reply)
 
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -268,7 +235,7 @@ async def red_room(message: types.Message, state: FSMContext, user: User):
         'Красный - самый яркий, огненный цвет. В этой комнате раньше был кабинет важной личности. Твой выбор означает, что ты сильная личность, у тебя много энергии, ты умеешь руководить, не боишься брать на себя ответственность и принимать сложные решения.')
 
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -287,7 +254,7 @@ async def yellow_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате часто проходили важные собрания, в которых всегда присутсововал лидер. Желтый - цвет лидера, если ты выбрал эту комнату, значит в тебе есть лидерские качества, способность объединять и вести за собой.')
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -306,7 +273,7 @@ async def green_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате раньше был кабинет, где день за днем кипела размеренная работа. Выбор этой комнаты говорит о том, что ты спокойный, уравновешенный, интеллектально разивитый, терпеливый, можешь выполнять сложные и объёмные задачи.')
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -325,7 +292,7 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате ранее проводились разного рода собрания и принимались важные решения, если ты выбрал эту комнату — это говорит о том, что ты очень общительный и у тебя много друзей, ты умеешь поддерживать непринуждную и легкую атмосферу в коллективе.')
     if q_num + 1 >= len(questions[user.team]):
-        await state.finish()
+        await state.clear()
         await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
         return
 
@@ -347,18 +314,17 @@ async def print_chat_id(message: types.Message):
 
 
 def register_stations(dp: Dispatcher):
-    dp.register_message_handler(print_chat_id, chat_type=types.ChatType.CHANNEL, state='*')
-    dp.register_message_handler(go, text="🚌 Поехали", chat_type=types.ChatType.PRIVATE)
+    dp.message.register(print_chat_id, F.chat_type == ChatType.CHANNEL)
+    dp.message.register(go, text="🚌 Поехали")
     # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
     # dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
     #                                    state=FSMQuestion.question)
-    dp.register_message_handler(red_room, text='🔴 Красный', state=FSMQuestion.question)
-    dp.register_message_handler(yellow_room, text='🟡 Желтый', state=FSMQuestion.question)
-    dp.register_message_handler(green_room, text='🟢 Зеленый', state=FSMQuestion.question)
-    dp.register_message_handler(blue_room, text='🔵 Синий', state=FSMQuestion.question)
-    dp.register_message_handler(message_answer, state=FSMQuestion.question)
-    dp.register_message_handler(media_group_handler(photo_answer), content_types=types.ContentType.PHOTO,
-                                state=FSMQuestion.question)
-    dp.register_message_handler(sticker_answer, content_types=types.ContentType.STICKER, state=FSMQuestion.question)
+    dp.message.register(red_room, F.text == '🔴 Красный', FSMQuestion.question)
+    dp.message.register(yellow_room, F.text == '🟡 Желтый', FSMQuestion.question)
+    dp.message.register(green_room, F.text == '🟢 Зеленый', FSMQuestion.question)
+    dp.message.register(blue_room, F.text == '🔵 Синий', FSMQuestion.question)
+    dp.message.register(message_answer, FSMQuestion.question)
+    dp.message.register(media_group_handler(photo_answer), F.photo, FSMQuestion.question)
+    dp.message.register(sticker_answer, F.sticker, FSMQuestion.question)
 
-    dp.register_message_handler(media_group_handler(redirect_photo), content_types=types.ContentType.PHOTO)
+    dp.message.register(media_group_handler(redirect_photo), F.photo)

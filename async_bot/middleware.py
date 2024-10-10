@@ -1,10 +1,38 @@
 import logging
+import traceback
+from typing import Dict, Callable, Any, Awaitable
 
-from aiogram import types
-from aiogram.dispatcher.middlewares import BaseMiddleware
+from aiogram import BaseMiddleware
+from aiogram.dispatcher.middlewares.user_context import UserContextMiddleware
+from aiogram.types import TelegramObject, Update, Message, CallbackQuery
 
+from async_bot.dialog_branches.utils import message_by_part
 from database.crud import get_user_by_id, update_user
 import async_bot.consts as const
+
+CHANNEL_ID = -1002148833317
+ADMIN_ID = 462939793
+
+
+class ErrorHandlerMiddleware(BaseMiddleware):
+    async def __call__(
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: Update,
+            data: Dict[str, Any]
+    ) -> Any:
+        try:
+            return await handler(event, data)
+        except Exception:
+            logging.error(traceback.format_exc())
+            event_context = UserContextMiddleware.resolve_event_context(event=event)
+
+            if event_context.user is not None:
+                await event.bot.send_message(ADMIN_ID, str(event_context.user))
+
+            for m in message_by_part(traceback.format_exc()):
+                await event.bot.send_message(ADMIN_ID, m, parse_mode=None)
+            return
 
 
 class DbSessionMiddleware(BaseMiddleware):
@@ -12,36 +40,24 @@ class DbSessionMiddleware(BaseMiddleware):
         super().__init__()
         self._sessionmaker = sessionmaker
 
-    async def on_pre_process_message(self, message: types.Message, data: dict):
-        logging.info(message.chat.id)
-        # await self.open_session_and_get_user(message, data)
-
-    async def on_process_message(self, message: types.Message, data: dict):
-        await self.open_session_and_get_user(message, data)
-
-    async def on_process_callback_query(self, callback: types.CallbackQuery, data: dict):
-        await self.open_session_and_get_user(callback.message, data)
-
-    async def on_post_process_message(self, message: types.Message, data_from_filter: list, data: dict):
-        await self.close_session(data)
-
-    async def on_post_process_callback_query(self, callback: types.CallbackQuery, data_from_filter: list, data: dict):
-        await self.close_session(data)
-
-    async def open_session_and_get_user(self, message, data: dict):
+    async def __call__(
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: Message | CallbackQuery,
+            data: Dict[str, Any]
+    ) -> Any:
         session = self._sessionmaker()
         data[const.SESSION] = session
 
-        user = await get_user_by_id(message.from_user.id, session)
+        user = await get_user_by_id(event.from_user.id, session)
         data[const.USER] = user
 
         if user is not None:
-            user.username = message.from_user.username
+            user.username = event.from_user.username
             await update_user(user, session)
 
-    async def close_session(self, data: dict):
-        if const.SESSION in data:
-            session = data[const.SESSION]
+        result = await handler(event, data)
 
-            if session:
-                await session.close()
+        await session.close()
+
+        return result
