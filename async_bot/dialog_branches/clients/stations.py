@@ -7,7 +7,7 @@ from aiogram.enums import ChatType
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
-from aiogram_media_group import media_group_handler, MediaGroupFilter
+from aiogram_media_group import media_group_handler
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
 from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest, LastPhotoState
@@ -123,7 +123,7 @@ async def go(message: types.Message, user: User, state: FSMContext):
             'start': datetime.datetime.now()}
     await state.update_data(data)
 
-    await process_question(message, questions[user.team][0])
+    await process_question(message, questions[user.team][0], state)
 
 
 async def message_answer(message: types.Message, user: User, state: FSMContext):
@@ -157,7 +157,7 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
         next = q_num + 1
 
     if q_num != next:
-        question = await process_question(message, questions[user.team][q_num + 1])
+        question = await process_question(message, questions[user.team][q_num + 1], state)
         await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -170,7 +170,7 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
         await message.delete()
         return
 
-    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
+    question = await process_question(message, questions[user.team][q_num + 1], state, close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -185,7 +185,7 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
     if question.correct_reply is not None:
         await message.answer(question.correct_reply)
 
-    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
+    question = await process_question(message, questions[user.team][q_num + 1], state, close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -200,7 +200,7 @@ async def red_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'Красный - самый яркий, огненный цвет. В этой комнате раньше был кабинет важной личности. Твой выбор означает, что ты сильная личность, у тебя много энергии, ты умеешь руководить, не боишься брать на себя ответственность и принимать сложные решения.')
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    question = await process_question(message, questions[user.team][q_num + 1], state)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -215,7 +215,7 @@ async def yellow_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате часто проходили важные собрания, в которых всегда присутсововал лидер. Желтый - цвет лидера, если ты выбрал эту комнату, значит в тебе есть лидерские качества, способность объединять и вести за собой.')
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    question = await process_question(message, questions[user.team][q_num + 1], state)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -230,7 +230,7 @@ async def green_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате раньше был кабинет, где день за днем кипела размеренная работа. Выбор этой комнаты говорит о том, что ты спокойный, уравновешенный, интеллектально разивитый, терпеливый, можешь выполнять сложные и объёмные задачи.')
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    question = await process_question(message, questions[user.team][q_num + 1], state)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -245,7 +245,7 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'В этой комнате ранее проводились разного рода собрания и принимались важные решения, если ты выбрал эту комнату — это говорит о том, что ты очень общительный и у тебя много друзей, ты умеешь поддерживать непринуждную и легкую атмосферу в коллективе.')
 
-    question = await process_question(message, questions[user.team][q_num + 1])
+    question = await process_question(message, questions[user.team][q_num + 1], state)
     await state.update_data(current=question, current_num=q_num + 1)
 
 

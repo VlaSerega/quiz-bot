@@ -71,7 +71,7 @@ async def ask_quest(message: types.Message, state: FSMContext, user: User):
         await FSMQuestion.question.set()
 
         q_num = data['current_num']
-        question = await process_question(message, questions[user.team][q_num + 1])
+        question = await process_question(message, questions[user.team][q_num + 1], state)
 
         await state.update_data(current=question, current_num=q_num + 1)
 

@@ -4,6 +4,7 @@ from typing import List
 
 from aiogram import types
 from aiogram.filters.callback_data import CallbackData
+from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, \
     ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
@@ -57,7 +58,8 @@ def create_keyboard_inline(buttons: List[Button], rows: List[int] = None) -> Inl
     return keyboard.as_markup()
 
 
-async def process_question(message: types.Message, question: Question | List[Question], additional_message=None):
+async def process_question(message: types.Message, question: Question | List[Question], state: FSMContext,
+                           additional_message=None):
     keyboard = ReplyKeyboardRemove()
     if type(question) is list:
         question = random.choice(question)
@@ -82,7 +84,7 @@ async def process_question(message: types.Message, question: Question | List[Que
     else:
         await message.answer(text_message, reply_markup=keyboard)
     if question.state is not None:
-        await question.state.set()
+        await state.set_state(question.state)
     return question
 
 
