@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
@@ -26,7 +28,7 @@ class DbSessionMiddleware(BaseMiddleware):
     async def open_session_and_get_user(self, message, data: dict):
         session = self._sessionmaker()
         data[const.SESSION] = session
-        print(message.chat.id)
+        logging.info(message.chat.id)
         user = await get_user_by_id(message.from_user.id, session)
         data[const.USER] = user
 
