@@ -130,7 +130,7 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
     question = data['current']
     q_num = data['current_num']
     next = q_num
-
+    print(question.type)
     if question.type != QuestionType.one:
         await message.delete()
         return
