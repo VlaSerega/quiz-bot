@@ -11,8 +11,8 @@ services:
       - "6000:5432"
     volumes:
       - postgres_quiz:/var/lib/postgresql/data
-    networks:
-      - mynetwork
+#    networks:
+#      - mynetwork
 
 #  bot:
 #    build:
@@ -27,6 +27,6 @@ services:
 volumes:
   postgres_quiz:
 
-networks:
-  mynetwork:
-    driver: bridge
+#networks:
+#  mynetwork:
+#    driver: bridge
