@@ -1,11 +1,8 @@
-import logging
-
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
 from database.crud import get_user_by_id, update_user
 import async_bot.consts as const
-from database.models import User
 
 
 class DbSessionMiddleware(BaseMiddleware):
@@ -28,7 +25,7 @@ class DbSessionMiddleware(BaseMiddleware):
     async def open_session_and_get_user(self, message, data: dict):
         session = self._sessionmaker()
         data[const.SESSION] = session
-        logging.info(message.chat.id)
+
         user = await get_user_by_id(message.from_user.id, session)
         data[const.USER] = user
 
