@@ -286,10 +286,8 @@ def register_stations(dp: Dispatcher):
     dp.message.register(sticker_answer, F.sticker, FSMQuestion.question)
     dp.message.register(last_message, F.text == 'Завершить', LastPhotoState.state)
 
-    dp.message.register(media_group_handler(last_album), MediaGroupFilter(is_media_group=True), F.photo,
-                        StateFilter(None))
-    dp.message.register(media_group_handler(last_album), MediaGroupFilter(is_media_group=True), F.photo,
-                        LastPhotoState.state)
+    dp.message.register(media_group_handler(last_album), F.media_group_id, F.photo, StateFilter(None))
+    dp.message.register(media_group_handler(last_album), F.media_group_id, F.photo, LastPhotoState.state)
 
     dp.message.register(last_photo, F.photo, StateFilter(None))
     dp.message.register(last_photo, F.photo, LastPhotoState.state)
