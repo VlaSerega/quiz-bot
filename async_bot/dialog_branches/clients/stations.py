@@ -7,11 +7,10 @@ from aiogram.enums import ChatType
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 from aiogram_media_group import media_group_handler
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
 from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest
-from async_bot.dialog_branches.utils import process_question, process_remain_question, create_keyboard_reply
+from async_bot.dialog_branches.utils import process_question, create_keyboard_reply
 from database.models import User, Team
 
 aq = [Question('Ты уже в музее Германа Титова в селе Полковниково?',
@@ -124,24 +123,6 @@ async def go(message: types.Message, user: User, state: FSMContext):
     await state.update_data(data)
 
     await process_question(message, questions[user.team][0])
-
-
-async def callback_send_answers(callback: types.CallbackQuery, session: AsyncSession, user: User, state: FSMContext):
-    await callback.answer()
-    await callback.message.delete()
-    data = await state.get_data()
-    question = data['current']
-    start = data['start']
-    remain = data['remain_questions']
-    s_answer = data['selected_answers']
-
-    answers = question.answers
-    delta = datetime.datetime.now() - start
-    elapsed_time = delta.seconds + (delta.microseconds // 10000) / 100
-    score = max(sum([a.score if a.id in s_answer else 0 for a in answers]), 0)
-
-    # await create_or_update_user_answer(session, user.chat_id, question.id, elapsed_time, score)
-    await process_remain_question(callback.message, remain, state, session)
 
 
 async def message_answer(message: types.Message, user: User, state: FSMContext):
