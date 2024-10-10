@@ -272,7 +272,7 @@ async def print_chat_id(message: types.Message):
 
 
 def register_stations(dp: Dispatcher):
-    dp.message.register(print_chat_id, F.chat_type == ChatType.CHANNEL)
+    dp.message.register(print_chat_id, F.chaе.type == ChatType.CHANNEL)
     dp.message.register(go, F.text == "🚌 Поехали")
     # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
     # dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
