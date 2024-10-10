@@ -4,12 +4,13 @@ from typing import List
 
 from aiogram import Dispatcher, types, F
 from aiogram.enums import ChatType
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
-from aiogram_media_group import media_group_handler
+from aiogram_media_group import media_group_handler, MediaGroupFilter
 
 from async_bot.dialog_branches.clients.question import QuestionType, Question, Action
-from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest
+from async_bot.dialog_branches.clients.states import FSMQuestion, FSMTest, LastPhotoState
 from async_bot.dialog_branches.utils import process_question, create_keyboard_reply
 from database.models import User, Team
 
@@ -99,7 +100,7 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
       Question(
           'Класс! Но это ещё не все! Теперь ты можешь всегда пользоваться стикерами с Марей и Мариком, для этого сохрани их себе, если не сделал этого раньше\n\n'
           'А ещё мы с Марей создали чат, где ты можешь общаться и делиться впечатлниями с такими же Открывателями Алтая! Переходи по <a href="https://t.me/+Dk7LT5zYUyYzMzMy">ссылке</a>, чтобы продолжить приключения с нами!',
-          QuestionType.one, answers=['Завершить'], cor_answer='Завершить'
+          QuestionType.one, answers=['Завершить'], cor_answer='Завершить', state=LastPhotoState.state
       ),
       Question('На сегодня это все! Мы продолжим наше путешествие завтра.\nНажми завтра кнопку "Едем дальше!"',
                answers=['Едем дальше!'], cor_answer='Едем дальше!')
@@ -155,32 +156,21 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
             await message.answer_sticker(question.sticker_correct)
         next = q_num + 1
 
-    if next >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
     if q_num != next:
         question = await process_question(message, questions[user.team][q_num + 1])
         await state.update_data(current=question, current_num=q_num + 1)
 
 
-async def photo_answer(messages: List[types.Message], user: User, state: FSMContext):
+async def photo_answer(message: types.Message, user: User, state: FSMContext):
     data = await state.get_data()
     question = data['current']
     q_num = data['current_num']
 
     if question.type != QuestionType.photo:
-        await messages[-1].delete()
+        await message.delete()
         return
 
-    await redirect_photo(messages)
-
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await messages[-1].answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
-
-    question = await process_question(messages[-1], questions[user.team][q_num + 1], close_keyboard)
+    question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
 
 
@@ -194,11 +184,6 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
 
     if question.correct_reply is not None:
         await message.answer(question.correct_reply)
-
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
 
     question = await process_question(message, questions[user.team][q_num + 1], close_keyboard)
     await state.update_data(current=question, current_num=q_num + 1)
@@ -215,11 +200,6 @@ async def red_room(message: types.Message, state: FSMContext, user: User):
     await message.answer(
         'Красный - самый яркий, огненный цвет. В этой комнате раньше был кабинет важной личности. Твой выбор означает, что ты сильная личность, у тебя много энергии, ты умеешь руководить, не боишься брать на себя ответственность и принимать сложные решения.')
 
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
-
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
 
@@ -234,10 +214,6 @@ async def yellow_room(message: types.Message, state: FSMContext, user: User):
 
     await message.answer(
         'В этой комнате часто проходили важные собрания, в которых всегда присутсововал лидер. Желтый - цвет лидера, если ты выбрал эту комнату, значит в тебе есть лидерские качества, способность объединять и вести за собой.')
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
 
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
@@ -253,10 +229,6 @@ async def green_room(message: types.Message, state: FSMContext, user: User):
 
     await message.answer(
         'В этой комнате раньше был кабинет, где день за днем кипела размеренная работа. Выбор этой комнаты говорит о том, что ты спокойный, уравновешенный, интеллектально разивитый, терпеливый, можешь выполнять сложные и объёмные задачи.')
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
 
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
@@ -272,22 +244,27 @@ async def blue_room(message: types.Message, state: FSMContext, user: User):
 
     await message.answer(
         'В этой комнате ранее проводились разного рода собрания и принимались важные решения, если ты выбрал эту комнату — это говорит о том, что ты очень общительный и у тебя много друзей, ты умеешь поддерживать непринуждную и легкую атмосферу в коллективе.')
-    if q_num + 1 >= len(questions[user.team]):
-        await state.clear()
-        await message.answer("Путешествие закончилось!", reply_markup=ReplyKeyboardRemove())
-        return
 
     question = await process_question(message, questions[user.team][q_num + 1])
     await state.update_data(current=question, current_num=q_num + 1)
 
 
+async def last_message(message: types.Message, state: FSMContext):
+    await message.answer('Приключение закончилось!', reply_markup=ReplyKeyboardRemove())
+    await state.clear()
+
+
 CHAT_ID = 1
 
 
-async def redirect_photo(messages: List[types.Message]):
-    bot = messages[-1].bot
+async def last_photo(message: types.Message, state: FSMContext):
+    await message.answer('Спасибо за класное фото!')
+    await message.bot.forward_message(CHAT_ID, message.chat.id, message.message_id)
 
-    await bot.forward_message(CHAT_ID, messages[-1].chat.id, messages[-1].message_id)
+
+async def last_album(messages: List[types.Message], state: FSMContext):
+    await messages[-1].answer('Спасибо за классные фото!')
+    await messages[-1].bot.forward_message(CHAT_ID, messages[-1].chat.id, messages[-1].message_id)
 
 
 async def print_chat_id(message: types.Message):
@@ -307,5 +284,12 @@ def register_stations(dp: Dispatcher):
     dp.message.register(message_answer, F.text, FSMQuestion.question)
     dp.message.register(photo_answer, F.photo, FSMQuestion.question)
     dp.message.register(sticker_answer, F.sticker, FSMQuestion.question)
+    dp.message.register(last_message, F.text == 'Завершить', LastPhotoState.state)
 
-    dp.message.register(media_group_handler(redirect_photo), F.photo)
+    dp.message.register(media_group_handler(last_album), MediaGroupFilter(is_media_group=True), F.photo,
+                        StateFilter(None))
+    dp.message.register(media_group_handler(last_album), MediaGroupFilter(is_media_group=True), F.photo,
+                        LastPhotoState.state)
+
+    dp.message.register(last_photo, F.photo, StateFilter(None))
+    dp.message.register(last_photo, F.photo, LastPhotoState.state)

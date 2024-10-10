@@ -12,3 +12,7 @@ class FSMQuestion(StatesGroup):
 
 class FSMTest(StatesGroup):
     test = State()
+
+
+class LastPhotoState(StatesGroup):
+    state = State()

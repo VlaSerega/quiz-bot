@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from async_bot.dialog_branches import register_branches
 from async_bot.dialog_branches.utils import menu_keyboard
-from async_bot.middleware import DbSessionMiddleware
+from async_bot.middleware import DbSessionMiddleware, ErrorHandlerMiddleware
 
 load_dotenv()
 
@@ -34,6 +34,8 @@ class AsyncBot:
     def __init__(self, sessionmaker):
         self.bot = Bot(token=token, default=DefaultBotProperties(parse_mode='HTML'))
         self._dp: Dispatcher = Dispatcher(bot=self.bot, storage=MemoryStorage())
+
+        self._dp.update.outer_middleware(ErrorHandlerMiddleware())
 
         self._dp.message.middleware(DbSessionMiddleware(sessionmaker))
         self._dp.callback_query.middleware(DbSessionMiddleware(sessionmaker))
