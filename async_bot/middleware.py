@@ -8,7 +8,6 @@ from aiogram.types import TelegramObject, Update, Message, CallbackQuery
 
 from async_bot.dialog_branches.utils import message_by_part
 from database.crud import get_user_by_id, update_user
-import async_bot.consts as const
 
 CHANNEL_ID = -1002148833317
 ADMIN_ID = 462939793
@@ -47,10 +46,10 @@ class DbSessionMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
         session = self._sessionmaker()
-        data[const.SESSION] = session
+        data["session"] = session
 
         user = await get_user_by_id(event.from_user.id, session)
-        data[const.USER] = user
+        data["user"] = user
 
         if user is not None:
             user.username = event.from_user.username
