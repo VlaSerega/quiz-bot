@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import List
 
 from aiogram import Dispatcher, types
@@ -342,7 +343,7 @@ async def redirect_photo(messages: List[types.Message]):
 
 
 async def print_chat_id(message: types.Message):
-    print('----------------', message.chat.id)
+    logging.info(f'---------------- {message.chat.id}')
 
 
 def register_stations(dp: Dispatcher):
