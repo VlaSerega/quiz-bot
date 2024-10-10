@@ -347,6 +347,7 @@ async def print_chat_id(message: types.Message):
 
 
 def register_stations(dp: Dispatcher):
+    dp.register_message_handler(print_chat_id, chat_type=types.ChatType.CHANNEL)
     dp.register_message_handler(go, text="🚌 Поехали", chat_type=types.ChatType.PRIVATE)
     # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
     # dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
@@ -361,4 +362,3 @@ def register_stations(dp: Dispatcher):
     dp.register_message_handler(sticker_answer, content_types=types.ContentType.STICKER, state=FSMQuestion.question)
 
     dp.register_message_handler(media_group_handler(redirect_photo), content_types=types.ContentType.PHOTO)
-    dp.register_message_handler(print_chat_id, chat_type=types.ChatType.CHANNEL)
