@@ -68,7 +68,7 @@ async def ask_quest(message: types.Message, state: FSMContext, user: User):
         else:
             await message.answer(
                 'Мне тоже интересно, что бы было, если бы купец 100 лет назад принимал такие решения. Возможно тебе могло повезти, но риски потерять все слишком высоки.')
-        await FSMQuestion.question.set()
+        await state.set_state(FSMQuestion.question)
 
         q_num = data['current_num']
         question = await process_question(message, questions[user.team][q_num + 1], state)
