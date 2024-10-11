@@ -50,7 +50,7 @@ class DbSessionMiddleware(BaseMiddleware):
 
         user = await get_user_by_id(event.from_user.id, session)
         data["user"] = user
-        print(event.chat.id)
+        print(event.forward_from)
         if user is not None:
             user.username = event.from_user.username
             await update_user(user, session)
