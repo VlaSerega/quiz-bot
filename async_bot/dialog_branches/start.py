@@ -10,12 +10,12 @@ from database.crud import update_user
 from database.models import User, Team
 
 
-async def command_start(message: types.Message, session: AsyncSession, user: User):
+async def command_start(message: types.Message, session: AsyncSession, user: User, state: FSMContext):
     if user is None:
         user = User(chat_id=message.chat.id, username=message.chat.username, name=message.chat.first_name)
         await update_user(user, session)
 
-        await FSMGreeting.name.set()
+        await state.set_state(FSMGreeting.name)
         await message.answer(
             "Привет, я бот #ОткрывайАлтай. Я сделаю твое сегодняшнее путешествие интересней и веселей. А если ты выполнишь все задания - тебя ждет реальный стикер пак с главными Алтайскими маралятами <b>Мариком</b> и <b>Марей</b>.")
         await message.answer("Напиши, как тебя зовут (Имя и фамилия)")
