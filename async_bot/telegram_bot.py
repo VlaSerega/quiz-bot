@@ -55,7 +55,7 @@ class AsyncBot:
         await self._set_commands()
 
         try:
-            await self._dp.start_polling(self.bot)
+            await self._dp.start_polling(self.bot, skip_updates=True)
         finally:
             await self._dp.storage.close()
             await self.bot.session.close()

@@ -9,7 +9,6 @@ from aiogram.types import TelegramObject, Update, Message, CallbackQuery
 from async_bot.dialog_branches.utils import message_by_part
 from database.crud import get_user_by_id, update_user
 
-CHANNEL_ID = 1
 ADMIN_ID = 462939793
 
 
@@ -50,7 +49,7 @@ class DbSessionMiddleware(BaseMiddleware):
 
         user = await get_user_by_id(event.from_user.id, session)
         data["user"] = user
-        print(event)
+
         if user is not None:
             user.username = event.from_user.username
             await update_user(user, session)

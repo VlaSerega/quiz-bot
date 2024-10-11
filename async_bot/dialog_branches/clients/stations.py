@@ -254,7 +254,7 @@ async def last_message(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-CHAT_ID = 1
+CHAT_ID = -1002388245037
 
 
 async def last_photo(message: types.Message, state: FSMContext):
