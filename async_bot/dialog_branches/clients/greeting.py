@@ -61,7 +61,7 @@ async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, st
     data = await state.get_data()
 
     team = callback.data
-    user = User(chat_id=callback.chat.id, username=callback.chat.username, name=data.get('name', ''),
+    user = User(chat_id=callback.from_user.id, username=callback.from_user.username, name=data.get('name', ''),
                 school=data.get('school', ''))
 
     if team == 'Марик':
