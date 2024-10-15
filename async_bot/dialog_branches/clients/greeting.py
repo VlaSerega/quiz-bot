@@ -37,7 +37,7 @@ async def greeting_school(message: types.Message, state: FSMContext):
 async def greeting_check_yes(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.edit_reply_markup()
-    print(callback.data)
+
     await callback.message.answer(
         "Сейчас тебе нужно выбрать верный маршрут твоего путешествия. Первая остановка будет в ... (Если сомневаешся, уточни у экскурсовода)",
         reply_markup=create_keyboard_inline(
@@ -80,6 +80,6 @@ async def greeting_team(callback: types.CallbackQuery, session: AsyncSession, st
 def register_greeting(dp: Dispatcher):
     dp.message.register(greeting_name, FSMGreeting.name)
     dp.message.register(greeting_school, FSMGreeting.school)
-    dp.message.register(greeting_check_yes, FSMGreeting.check)
-    dp.message.register(greeting_check_no, FSMGreeting.check, CorrectCallbackData.filter(F.correct == 'False'))
+    dp.callback_query.register(greeting_check_yes, FSMGreeting.check, CorrectCallbackData.filter(F.correct == 'True'))
+    dp.callback_query.register(greeting_check_no, FSMGreeting.check, CorrectCallbackData.filter(F.correct == 'False'))
     dp.callback_query.register(greeting_team, FSMGreeting.team)
