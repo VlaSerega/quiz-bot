@@ -10,14 +10,14 @@ from database.crud import *
 from database.models import Team
 
 
-class CorrectCallbackData(CallbackData, prefix='correct'):
+class CorrectCallbackData(CallbackData, prefix='is_correct'):
     correct: bool
 
 
 async def greeting_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await message.answer(
-        f"Отлично, <b>{message.text}</b>. Напиши, мз какой ты школы, можно просто номер", )
+        f"Отлично, <b>{message.text}</b>. Напиши, из какой ты школы, можно просто номер", )
     await state.set_state(FSMGreeting.school)
 
 
