@@ -3,6 +3,8 @@ from aiogram.fsm.state import State, StatesGroup
 
 class FSMGreeting(StatesGroup):
     name = State()
+    school = State()
+    check = State()
     team = State()
 
 

@@ -47,6 +47,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=True)
 
     name = Column(String(100), nullable=True)
+    school = Column(String(200), nullable=True)
     team = Column(Enum(Team))
     register_date = Column(DateTime, nullable=False, server_default=func.now())
 
