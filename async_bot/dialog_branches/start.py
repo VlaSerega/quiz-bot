@@ -1,7 +1,6 @@
 from aiogram import types, Dispatcher
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import ReplyKeyboardRemove
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches.clients.states import FSMGreeting
@@ -21,8 +20,8 @@ async def command_start(message: types.Message, session: AsyncSession, user: Use
 
 
 async def change_team(message: types.Message, session: AsyncSession, user: User, state: FSMContext):
-    if user.team is None:
-        await message.answer('Ты пока еще не присоединился ни к одной окманде', reply_markup=ReplyKeyboardRemove())
+    if user is None:
+        await command_start(message, session, user, state)
         return
 
     if user.team == Team.marik:
