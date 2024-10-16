@@ -1,4 +1,3 @@
-import datetime
 import logging
 from typing import List
 
@@ -98,8 +97,7 @@ aq = [Question('Ты уже в музее Германа Титова в сел�
           cor_answer='Забрал подарок'
       ),
       Question(
-          'Класс! Но это ещё не все! Теперь ты можешь всегда пользоваться стикерами с Марей и Мариком, для этого сохрани их себе, если не сделал этого раньше\n\n'
-          'А теперь НАШ долгожданный КОНКУРС!\n\nТы же успел сделать много классных фото в поездке?\nВыбирай 4 самых лучших, с самыми яркими эмоциями! Будет здорово если в кадр попадет «герой» или «герои».\n\nОтправляй мне в чат фотографии и жди результаты! '
+          'А теперь НАШ долгожданный <b>КОНКУРС</b>!\n\nТы же успел сделать много классных фото в поездке?\nВыбирай 4 самых лучших, с самыми яркими эмоциями! Будет здорово если в кадр попадет «герой» или «герои».\n\nОтправляй мне в чат фотографии и жди результаты! '
           'Я то знаю, что именно ты победишь!\n\nP.S. Победитель определяется в каждой группе путем определения самой эмоциональной фотографии. Судейская комиссия состоит из организаторов тура.',
           QuestionType.one, answers=['Завершить'], cor_answer='Завершить', state=LastPhotoState.state
       ),
@@ -120,8 +118,7 @@ close_keyboard = '\n\n<i>(сверни клавиатуру, чтобы увид
 async def go(message: types.Message, user: User, state: FSMContext):
     await state.set_state(FSMQuestion.question)
 
-    data = {'current': questions[user.team][0], 'current_num': 0, 'selected_answers': [],
-            'start': datetime.datetime.now()}
+    data = {'current': questions[user.team][0], 'current_num': 0}
     await state.update_data(data)
 
     await process_question(message, questions[user.team][0], state)
@@ -129,8 +126,8 @@ async def go(message: types.Message, user: User, state: FSMContext):
 
 async def message_answer(message: types.Message, user: User, state: FSMContext):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
     next = q_num
 
     if question.type != QuestionType.one:
@@ -164,8 +161,8 @@ async def message_answer(message: types.Message, user: User, state: FSMContext):
 
 async def photo_answer(message: types.Message, user: User, state: FSMContext):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
 
     if question.type != QuestionType.photo:
         await message.delete()
@@ -177,8 +174,9 @@ async def photo_answer(message: types.Message, user: User, state: FSMContext):
 
 async def sticker_answer(message: types.Message, user: User, state: FSMContext):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
+
     if question.type != QuestionType.sticker:
         await message.delete()
         return
@@ -192,8 +190,9 @@ async def sticker_answer(message: types.Message, user: User, state: FSMContext):
 
 async def red_room(message: types.Message, state: FSMContext, user: User):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
+
     if question.type != QuestionType.any:
         await message.delete()
         return
@@ -207,8 +206,9 @@ async def red_room(message: types.Message, state: FSMContext, user: User):
 
 async def yellow_room(message: types.Message, state: FSMContext, user: User):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
+
     if question.type != QuestionType.any:
         await message.delete()
         return
@@ -222,8 +222,9 @@ async def yellow_room(message: types.Message, state: FSMContext, user: User):
 
 async def green_room(message: types.Message, state: FSMContext, user: User):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
+
     if question.type != QuestionType.any:
         await message.delete()
         return
@@ -237,8 +238,9 @@ async def green_room(message: types.Message, state: FSMContext, user: User):
 
 async def blue_room(message: types.Message, state: FSMContext, user: User):
     data = await state.get_data()
-    question = data['current']
-    q_num = data['current_num']
+    question = data.get('current', questions[user.team][0])
+    q_num = data.get('current_num', 0)
+
     if question.type != QuestionType.any:
         await message.delete()
         return
@@ -282,9 +284,6 @@ async def print_chat_id(message: types.Message):
 def register_stations(dp: Dispatcher):
     dp.message.register(print_chat_id, F.chaе.type == ChatType.CHANNEL)
     dp.message.register(go, F.text == "🚌 Поехали")
-    # dp.register_callback_query_handler(callback_answer, callback_data_answer.filter(), state=FSMQuestion.question)
-    # dp.register_callback_query_handler(callback_send_answers, CallbackData('Ответ').filter(),
-    #                                    state=FSMQuestion.question)
     dp.message.register(red_room, F.text == '🔴 Красный', FSMQuestion.question)
     dp.message.register(yellow_room, F.text == '🟡 Желтый', FSMQuestion.question)
     dp.message.register(green_room, F.text == '🟢 Зеленый', FSMQuestion.question)
