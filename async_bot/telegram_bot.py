@@ -2,13 +2,17 @@ import logging
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from async_bot.dialog_branches import register_branches
+from async_bot.dialog_branches.start import command_start
 from async_bot.dialog_branches.utils import menu_keyboard
 from async_bot.middleware import DbSessionMiddleware, ErrorHandlerMiddleware
+from database.models import User
 
 load_dotenv()
 
@@ -22,8 +26,11 @@ async def photo_id(message: types.Message):
         await message.answer(message.sticker.file_id)
 
 
-async def default(message: types.Message):
-    await message.answer_photo("AgACAgIAAxkBAAM0ZPceqsvXX_SgyfABqu-_F4rK4akAAhbLMRu2s7hLIYDF7GgoZewBAAMCAAN5AAMwBA",
+async def default(message: types.Message, session: AsyncSession, user: User, state: FSMContext):
+    if user is None:
+        await command_start(message, session, user, state)
+    else:
+        await message.answer_photo("AgACAgIAAxkBAAM0ZPceqsvXX_SgyfABqu-_F4rK4akAAhbLMRu2s7hLIYDF7GgoZewBAAMCAAN5AAMwBA",
                                caption="К сожалению, я еще не умею отвечать на такое.\n\n"
                                        "Возможно, мое меню тебе поможет тебе разобраться",
                                reply_markup=menu_keyboard)
